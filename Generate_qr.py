@@ -5,11 +5,17 @@ import base64
 from io import BytesIO
 import urllib.parse 
 
+# Properly encode the password
 password = urllib.parse.quote_plus("@Ashutosh7383")
 
-client = pymongo.MongoClient(f"mongodb+srv://Ashutosh:{password}@cluster0.bdei33h.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-db = client["qr_database"]
-collection = db["qr_codes"]
+# MongoDB Connection
+try:
+    client = pymongo.MongoClient(f"mongodb+srv://Ashutosh:{password}@cluster0.bdei33h.mongodb.net/?retryWrites=true&w=majority")
+    db = client["qr_database"]
+    collection = db["qr_codes"]
+except pymongo.errors.ConfigurationError as e:
+    st.error("MongoDB Connection Error. Please check your credentials and network settings.")
+    st.stop()
 
 def generate_qr(url, mainColor, BackColor):
     qr = qrcode.QRCode(
@@ -27,23 +33,20 @@ def generate_qr(url, mainColor, BackColor):
     img.save(buffered, format="PNG")
     return buffered.getvalue()  
 
-# Function to save data in MongoDB
 def save_mongo(name, url, qr_data):
     qr_base64 = base64.b64encode(qr_data).decode()  
     collection.insert_one({"name": name, "url": url, "qr_code": qr_base64})  
 
-# Function to generate download link
 def get_image_download_link(img_data, filename="qr_code.png"):
     b64 = base64.b64encode(img_data).decode()
     href = f'<a href="data:image/png;base64,{b64}" download="{filename}">Download QR Code</a>'
     return href
 
-
 st.title("Generate QR Code for Free")
 name = st.text_input("Enter Your Name:")
 url = st.text_input("Enter Your URL:")
-mainColor = st.text_input("Enter Color of Qr:")
-BackColor = st.text_input("Enter Background of Qr:")
+mainColor = st.text_input("Enter Color of QR:")
+BackColor = st.text_input("Enter Background Color of QR:")
 
 if st.button("Generate QR Code"):
     if url:
