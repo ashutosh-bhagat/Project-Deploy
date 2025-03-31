@@ -7,7 +7,7 @@ import urllib.parse
 
 password = urllib.parse.quote_plus("@Ashutosh7383")
 
-client = pymongo.MongoClient(f"mongodb+srv://Ashutosh_Bhagat:{password}@cluster0.1uqt9dl.mongodb.net/?retryWrites=true&w=majority")
+client = pymongo.MongoClient(f"mongodb+srv://Ashutosh:{password}@cluster0.bdei33h.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 db = client["qr_database"]
 collection = db["qr_codes"]
 
